@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Circular Timer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .main-container {
+      width: 100%;
+      height: 100vh;
+      background-color: white;
+    }
+
+    .circle-container {
+      width: 400px;
+      height: 400px;
+      background-color: #ddd;
+      border-radius: 50%;
+      position: absolute;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .semicircle {
+      width: 50%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: center right;
+    }
+
+    .semicircle:nth-child(1) {
+      background-color: #088b8b;
+      z-index: 2;
+    }
+
+    .semicircle:nth-child(2) {
+      background-color: #088b8b;
+      z-index: 3;
+    }
+
+    .semicircle:nth-child(3) {
+      background-color: #ddd;
+      z-index: 4;
+      /* display: none; */
+    }
+
+    .outermost-circle {
+      width: 390px;
+      height: 390px;
+      background-color: white;
+      border-radius: 50%;
+      z-index: 5;
+      /* display: none; */
+    }
+
+    .timer-container {
+      width: 330px;
+      height: 200px;
+      z-index: 6;
+    }
+
+    .timer {
+      width: 4000px;
+      height: 100px;
+      z-index: 7;
+    }
+
+    .timer div {
+      font-size: 70px;
+      font-weight: 100;
+      width: 80px;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .timer .colon {
+      background-color: transparent;
+      width: 10px;
+      margin-left: 0;
+      margin-right: 0;
+      padding-bottom: 15px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-container center">
+    <div class="circle-container center">
+      <div class="semicircle"></div>
+      <div class="semicircle"></div>
+      <div class="semicircle"></div>
+      <div class="outermost-circle"></div>
+    </div>
+
+    <div class="timer-container center">
+      <div class="timer center"></div>
+    </div>
+  </div>
+
+  <script>
+    const semiCircles = document.querySelectorAll('.semicircle');
+    const timer = document.querySelector('.timer');
+
+    // Input
+    const hr = 0;
+    const min = 0;
+    const sec = 60;
+
+    const hours = hr * 3600000;
+    const minutes = min * 60000;
+    const seconds = sec * 1000;
+    const setTime = hours + minutes + seconds;
+    const startTime = Date.now();
+    const futureTime = startTime + setTime;
+
+    const timerLoop = setInterval(countDownTimer);
+
+    countDownTimer();
+
+    function countDownTimer() {
+      const currentTime = Date.now();
+
+      const remainingTime = futureTime - currentTime;
+
+      const angle = (remainingTime / setTime) * 360;
+
+      if (angle > 180) {
+        semiCircles[0].style.transform = 'rotate(180deg)';
+        semiCircles[1].style.transform = `rotate(${angle}deg)`;
+        semiCircles[2].style.display = 'none';
+      } else {
+        semiCircles[0].style.transform = `rotate(${angle}deg)`;
+        semiCircles[1].style.transform = `rotate(${angle}deg)`;
+        semiCircles[2].style.display = 'block';
+      }
+
+      const hrs = Math.floor((remainingTime / (1000 * 60 * 60)) % 24).toLocaleString('en-US', { minimumIntegerDigits: 2 });
+      const mins = Math.floor((remainingTime / (1000 * 60)) % 60).toLocaleString('en-US', { minimumIntegerDigits: 2 });
+      const secs = Math.floor((remainingTime / (1000)) % 60).toLocaleString('en-US', { minimumIntegerDigits: 2 });
+
+      timer.innerHTML = `
+      <div>${hrs}</div>
+      <div class="colon">:</div>
+      <div>${mins}</div>
+      <div class="colon">:</div>
+      <div>${secs}</div>
+      `
+
+      if (remainingTime < 0) {
+        clearInterval(timerLoop)
+        semiCircles[0].style.display = 'none';
+        semiCircles[1].style.display = 'none';
+        semiCircles[2].style.display = 'none';
+
+        timer.innerHTML = `
+        <div>00</div>
+        <div class="colon">:</div>
+        <div>00</div>
+        <div class="colon">:</div>
+        <div>00</div>
+        `
+      }
+    }
+
+  </script>
+</body>
+
+</html>
